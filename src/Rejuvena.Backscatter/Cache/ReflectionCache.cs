@@ -67,7 +67,7 @@ namespace Rejuvena.Backscatter.Cache
             type.FullName + "." + key + GetSignature(signature),
             () => type.GetMethod(
                 key,
-                ReflectionFlags.UniversalFlags, 
+                ReflectionFlags.UniversalFlags,
                 null,
                 CallingConventions.Any,
                 signature,
@@ -104,12 +104,40 @@ namespace Rejuvena.Backscatter.Cache
             assembly.FullName + "::" + key,
             () => assembly.GetType(key)
         );
-        
+
         public static Type? GetCachedNestedType(Type type, string key) => RetrieveFromCache(
             ReflectionType.NestedType,
             type.FullName + "/" + key,
             () => type.GetNestedType(key)
         );
+
+        #endregion
+
+        #region Null-Intolerant Retrieval
+
+        public static FieldInfo GetCachedFieldNotNull(Type type, string key) =>
+            GetCachedField(type, key) ?? throw new Exception();
+
+        public static PropertyInfo GetCachedPropertyNotNull(Type type, string key) =>
+            GetCachedProperty(type, key) ?? throw new Exception();
+
+        public static MethodInfo GetCachedMethodNotNull(Type type, string key, Type[] signature) =>
+            GetCachedMethod(type, key, signature) ?? throw new Exception();
+
+        public static MethodInfo GetCachedMethodNotNull(Type type, string key) =>
+            GetCachedMethod(type, key) ?? throw new Exception();
+
+        public static ConstructorInfo GetCachedConstructorNotNull(Type type, Type[] signature) =>
+            GetCachedConstructor(type, signature) ?? throw new Exception();
+
+        public static ConstructorInfo GetCachedStaticConstructorNotNull(Type type) =>
+            GetCachedStaticConstructor(type) ?? throw new Exception();
+
+        public static Type GetCachedTypeNotNull(Assembly assembly, string key) =>
+            GetCachedType(assembly, key) ?? throw new Exception();
+
+        public static Type GetCachedNestedTypeNotNull(Type type, string key) =>
+            GetCachedNestedType(type, key) ?? throw new Exception();
 
         #endregion
     }
