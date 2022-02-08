@@ -140,5 +140,52 @@ namespace Rejuvena.Backscatter.Cache
             GetCachedNestedType(type, key) ?? throw new Exception();
 
         #endregion
+
+        #region Reflection Utilities
+
+        public static T GetValue<T>(MemberInfo info, object? instance = null)
+        {
+            return info switch
+            {
+                FieldInfo field => (T) field.GetValue(instance),
+                PropertyInfo property => (T) property.GetValue(instance),
+                _ => throw new ArgumentOutOfRangeException(nameof(info))
+            };
+        }
+
+        public static void SetValue(MemberInfo info, object? instance, object? value)
+        {
+            switch (info)
+            {
+                case FieldInfo field:
+                    field.SetValue(instance, value);
+                    break;
+
+                case PropertyInfo property:
+                    property.SetValue(instance, value);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(info));
+            }
+        }
+
+        #endregion
+
+        #region Instance Utilities
+
+        public static TReturn? GetFieldValue<TType, TReturn>(TType instance, string member) =>
+            (TReturn?) GetCachedField(typeof(TType), member)?.GetValue(instance);
+
+        public static TReturn? GetPropertyValue<TType, TReturn>(TType instance, string member) =>
+            (TReturn?) GetCachedProperty(typeof(TType), member)?.GetValue(instance);
+
+        public static void SetFieldValue<TType>(TType instance, string member, object? value = null) =>
+            GetCachedField(typeof(TType), member)?.SetValue(instance, value);
+
+        public static void SetPropertyValue<TType>(TType instance, string member, object? value = null) =>
+            GetCachedProperty(typeof(TType), member)?.SetValue(instance, value);
+
+        #endregion
     }
 }
